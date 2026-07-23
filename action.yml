@@ -1,0 +1,16 @@
+name: "GeminiPilot Agent"
+description: "An autonomous GitHub Copilot using Google Gemini. Reviews code, answers questions, and solves issues."
+author: "echosmart36"
+inputs:
+  GITHUB_TOKEN:
+    description: "GitHub token for interacting with the repository."
+    required: true
+  GEMINI_API_KEY:
+    description: "Google Gemini API key."
+    required: true
+  FIREBASE_API_KEY:
+    description: "Firebase API key for state management (optional)."
+    required: false
+runs:
+  using: "node20"
+  main: "dist/index.js"

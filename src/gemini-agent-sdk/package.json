@@ -1,0 +1,15 @@
+{
+  "name": "@geminipilot/agent-sdk",
+  "version": "1.0.0",
+  "description": "Autonomous Gemini Agent SDK for GitHub Copilot features, supporting keyless OAuth and Workload Identity.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@google/genai": "^0.1.1"
+  },
+  "author": "GeminiPilot",
+  "license": "MIT"
+}

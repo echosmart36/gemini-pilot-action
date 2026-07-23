@@ -1,0 +1,28 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "rules": ["read: if request.auth.uid == resource.id;", "write: if request.auth.uid == resource.id;"],
+      "schema": {
+        "email": "string",
+        "githubConnected": "boolean",
+        "githubUsername": "string",
+        "googleConnected": "boolean",
+        "createdAt": "timestamp"
+      }
+    },
+    {
+      "name": "repositories",
+      "rules": ["read: if request.auth.uid == resource.data.userId;", "write: if request.auth.uid == request.resource.data.userId;"],
+      "schema": {
+        "userId": "string",
+        "fullName": "string",
+        "model": "string",
+        "autoPr": "boolean",
+        "reviewLevel": "string",
+        "status": "string",
+        "createdAt": "timestamp"
+      }
+    }
+  ]
+}
