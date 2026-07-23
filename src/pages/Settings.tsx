@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import { Settings as SettingsIcon, CheckCircle, Save } from 'lucide-react';
+import CustomSelect from '../components/CustomSelect';
 
 export default function Settings() {
   const [model, setModel] = useState('gemini-3.1-pro');
@@ -37,37 +38,46 @@ export default function Settings() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <header className="mb-8 flex items-center gap-3">
-        <SettingsIcon className="w-6 h-6 text-gray-400" />
-        <h1 className="text-2xl font-bold">Preferences</h1>
+    <div className="p-6 md:p-10 max-w-7xl mx-auto h-full flex flex-col font-sans">
+      <header className="mb-10 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+          <SettingsIcon className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Preferences</h1>
+          <p className="text-sm text-gray-400 mt-1">Manage global agent defaults and account settings.</p>
+        </div>
       </header>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-        <h2 className="text-sm font-semibold text-gray-300 mb-6 uppercase tracking-wider">AI Model Configuration</h2>
+      <div className="bg-[#0A0A0E] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
         
-        <div className="space-y-4 max-w-md">
-          <label className="block text-sm text-gray-400">Select Gemini Model</label>
-          <select 
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm text-white outline-none focus:border-purple-500"
-          >
-            <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
-            <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
-            <option value="gemini-3.6-flash-thinking">Gemini 3.6 Flash (Thinking)</option>
-          </select>
-          <p className="text-xs text-gray-500">This model will be used by the autonomous agent to resolve issues and review PRs.</p>
+        <h2 className="text-xs font-bold text-gray-400 mb-8 uppercase tracking-widest">Global AI Configuration</h2>
+        
+        <div className="space-y-6 max-w-md">
+          <div>
+            <label className="text-xs font-bold text-gray-300 uppercase tracking-wider block mb-3">Default Gemini Model</label>
+            <CustomSelect 
+              options={[
+                { label: 'Gemini 3.1 Flash Lite (Ultra Fast)', value: 'gemini-3.1-flash-lite' },
+                { label: 'Gemini 3.5 Flash (General + Search)', value: 'gemini-3.5-flash' },
+                { label: 'Gemini 3.1 Pro Preview (Complex + Thinking)', value: 'gemini-3.1-pro-preview' }
+              ]}
+              value={model}
+              onChange={setModel}
+            />
+            <p className="text-xs text-gray-500 mt-3 leading-relaxed">This model will be used by default when injecting new agents into your repositories.</p>
+          </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-8 pt-8 border-t border-white/5">
           <button 
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors font-medium text-sm"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-black hover:bg-gray-200 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] font-bold text-sm disabled:opacity-50 disabled:hover:scale-100 disabled:bg-white/20 disabled:text-gray-400"
           >
             {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-            {saved ? 'Saved' : 'Save Settings'}
+            {saved ? 'Preferences Saved' : 'Save Global Preferences'}
           </button>
         </div>
       </div>

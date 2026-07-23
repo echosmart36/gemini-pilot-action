@@ -6,9 +6,12 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 async function run(): Promise<void> {
   try {
-    const token = core.getInput('GITHUB_TOKEN', { required: true });
-    const geminiApiKey = core.getInput('GEMINI_API_KEY', { required: true });
-    const firebaseApiKey = core.getInput('FIREBASE_API_KEY', { required: false });
+    const token = process.env.GITHUB_TOKEN;
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const firebaseApiKey = process.env.FIREBASE_API_KEY;
+
+    if (!token) throw new Error('GITHUB_TOKEN environment variable is missing.');
+    if (!geminiApiKey) throw new Error('GEMINI_API_KEY environment variable is missing.');
     
     let preferredModel = 'gemini-3.5-flash';
 

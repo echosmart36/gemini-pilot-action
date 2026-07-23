@@ -33,22 +33,27 @@ export default function CustomSelect({ options, value, onChange, position = 'bot
     <div className="relative w-full font-sans" ref={dropdownRef}>
       <button
         type="button"
-        className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white flex justify-between items-center hover:bg-white/10 transition-colors focus:border-blue-500 outline-none"
-        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-black border border-white/10 rounded-xl p-3.5 text-sm text-white flex justify-between items-center hover:border-white/20 transition-colors focus:border-blue-500 outline-none"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
       >
         <span className="truncate">{selectedOption?.label || "Select an option"}</span>
         <ChevronDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
       </button>
 
       {isOpen && (
-        <div className={`absolute z-50 w-full bg-[#1a1b1e] border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto ${position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+        <div className={`absolute z-[100] w-full bg-[#0F0F13] border border-white/10 rounded-xl shadow-2xl max-h-64 overflow-y-auto ${position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'} py-1`}>
           {options.map((option) => (
             <div
               key={option.value}
-              className={`p-3 text-sm cursor-pointer hover:bg-white/10 transition-colors ${
-                option.value === value ? 'bg-blue-600/20 text-blue-400' : 'text-gray-300'
+              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between ${
+                option.value === value ? 'bg-blue-600/10 text-blue-400 font-medium' : 'text-gray-300 hover:bg-white/5 hover:text-white'
               }`}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 onChange(option.value);
                 setIsOpen(false);
               }}
