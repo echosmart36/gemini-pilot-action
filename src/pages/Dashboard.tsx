@@ -4,13 +4,14 @@ import { signInWithPopup, GithubAuthProvider } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, githubProvider, db } from '../lib/firebase';
 import { Octokit } from '@octokit/rest';
+import CustomSelect from '../components/CustomSelect';
 
 export default function Dashboard() {
   const [githubConnected, setGithubConnected] = useState(false);
   const [githubToken, setGithubToken] = useState<string | null>(null);
   const [repos, setRepos] = useState<any[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<string>('');
-  const [preferredModel, setPreferredModel] = useState('gemini-2.5-flash');
+  const [preferredModel, setPreferredModel] = useState('gemini-3.5-flash');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -36,12 +37,13 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchRepoPrefs = async () => {
       if (selectedRepo && auth.currentUser) {
-        const repoRef = doc(db, 'repositories', selectedRepo);
+        const repoId = selectedRepo.replace(/\//g, '_');
+        const repoRef = doc(db, 'repositories', repoId);
         const repoSnap = await getDoc(repoRef);
         if (repoSnap.exists()) {
-          setPreferredModel(repoSnap.data().model || 'gemini-2.5-flash');
+          setPreferredModel(repoSnap.data().model || 'gemini-3.5-flash');
         } else {
-          setPreferredModel('gemini-2.5-flash');
+          setPreferredModel('gemini-3.5-flash');
         }
       }
     };
@@ -84,7 +86,8 @@ export default function Dashboard() {
     if (!auth.currentUser || !selectedRepo) return;
     setSaving(true);
     try {
-      await setDoc(doc(db, 'repositories', selectedRepo), {
+      const repoId = selectedRepo.replace(/\//g, '_');
+      await setDoc(doc(db, 'repositories', repoId), {
         userId: auth.currentUser.uid,
         fullName: selectedRepo,
         model: preferredModel,
@@ -179,7 +182,7 @@ jobs:
           </div>
         </div>
 
-        <div className="bg-black/60 rounded-2xl border border-white/10 flex flex-col p-6">
+        <div className="bg-black/60 rounded-2xl border border-white/10 flex flex-col p-6 overflow-visible">
           <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-widest mb-4 flex items-center gap-2">
             <Code className="w-4 h-4 text-blue-400" />
             Repository Preferences
@@ -196,28 +199,26 @@ jobs:
             <div className="space-y-6">
               <div>
                 <label className="text-xs text-gray-400 block mb-2 font-sans">Select Repository</label>
-                <select 
-                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white outline-none focus:border-blue-500 font-sans"
+                <CustomSelect
+                  options={repos.map(repo => ({ label: repo.full_name, value: repo.full_name }))}
                   value={selectedRepo}
-                  onChange={(e) => setSelectedRepo(e.target.value)}
-                >
-                  {repos.map(repo => (
-                    <option key={repo.full_name} value={repo.full_name}>{repo.full_name}</option>
-                  ))}
-                </select>
+                  onChange={setSelectedRepo}
+                />
               </div>
 
               <div>
                 <label className="text-xs text-gray-400 block mb-2 font-sans">AI Model for this Repo</label>
-                <select 
-                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white outline-none focus:border-blue-500 font-sans"
+                <CustomSelect
+                  options={[
+                    { label: 'Gemini 3.1 Flash Lite (Ultra Fast)', value: 'gemini-3.1-flash-lite' },
+                    { label: 'Gemini 3.5 Flash (General + Search)', value: 'gemini-3.5-flash' },
+                    { label: 'Gemini 3.1 Pro Preview (Complex + Thinking)', value: 'gemini-3.1-pro-preview' },
+                    { label: 'Gemini 2.5 Flash (Legacy Fast)', value: 'gemini-2.5-flash' },
+                    { label: 'Gemini 2.5 Pro (Legacy Pro)', value: 'gemini-2.5-pro' }
+                  ]}
                   value={preferredModel}
-                  onChange={(e) => setPreferredModel(e.target.value)}
-                >
-                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast, Efficient)</option>
-                  <option value="gemini-2.5-pro">Gemini 2.5 Pro (Powerful, Complex)</option>
-                  <option value="gemini-3.1-pro">Gemini 3.1 Pro (Experimental)</option>
-                </select>
+                  onChange={setPreferredModel}
+                />
               </div>
 
               <button 

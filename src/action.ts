@@ -10,7 +10,7 @@ async function run(): Promise<void> {
     const geminiApiKey = core.getInput('GEMINI_API_KEY', { required: true });
     const firebaseApiKey = core.getInput('FIREBASE_API_KEY', { required: false });
     
-    let preferredModel = 'gemini-2.5-flash';
+    let preferredModel = 'gemini-3.5-flash';
 
     const octokit = github.getOctokit(token);
     const { context } = github;
@@ -38,7 +38,7 @@ async function run(): Promise<void> {
           // Include other config if necessary
         });
         const db = getFirestore(app);
-        const repoFullName = `${context.repo.owner}/${context.repo.repo}`;
+        const repoFullName = `${context.repo.owner}_${context.repo.repo}`;
         const repoDoc = await getDoc(doc(db, 'repositories', repoFullName));
         
         if (repoDoc.exists()) {
@@ -54,11 +54,22 @@ async function run(): Promise<void> {
     }
 
     const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+    
+    let config: any = {
+      systemInstruction: 'You are an autonomous GitHub Copilot. Review code, answer questions, and solve issues politely and concisely.',
+    };
+    
+    if (preferredModel === 'gemini-3.1-pro-preview') {
+      config.thinkingConfig = { thinkingLevel: 'high' };
+    }
+    
+    if (preferredModel === 'gemini-3.5-flash') {
+      config.tools = [{ googleSearch: {} }];
+    }
+
     const chat = ai.chats.create({
       model: preferredModel,
-      config: {
-        systemInstruction: 'You are an autonomous GitHub Copilot. Review code, answer questions, and solve issues politely and concisely.',
-      }
+      config
     });
 
     let prompt = `Review the following event on ${context.repo.owner}/${context.repo.repo} issue #${issueNumber}.\n`;

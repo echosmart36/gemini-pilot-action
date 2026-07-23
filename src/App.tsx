@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Jobs from './pages/Jobs';
 import Settings from './pages/Settings';
+import Chatbot from './components/Chatbot';
 
 export default function App() {
   const [user, setUser] = useState<any>(undefined); // undefined means loading
@@ -41,6 +42,7 @@ export default function App() {
           </>
         )}
       </Routes>
+      {user && <Chatbot />}
     </BrowserRouter>
   );
 }
